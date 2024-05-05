@@ -13,7 +13,7 @@ type Chat struct {
 
 type UserChats struct {
 	UserID int64 `bson:"_id"`
-	chats  []struct {
+	Chats  []struct {
 		ChatID int64  `bson:"c_id"`
 		Name   string `bson:"name"`
 	}

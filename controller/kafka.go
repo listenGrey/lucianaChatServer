@@ -3,6 +3,8 @@ package controller
 import (
 	"encoding/json"
 	"github.com/segmentio/kafka-go"
+	"lucianaChatServer/dao"
+	"lucianaChatServer/model"
 	"time"
 
 	"context"
@@ -23,13 +25,13 @@ func NewChat(address string) error {
 		if err != nil {
 			return err
 		}
-		var user model.User
-		err = json.Unmarshal(ms.Value, &user)
+		var newChat model.Chat
+		err = json.Unmarshal(ms.Value, &newChat)
 		if err != nil {
 			return err
 		}
 
-		err = dao.Register(&user)
+		err = dao.NewChat(ms.Key, &newChat)
 		if err != nil {
 			return err
 		}
@@ -40,7 +42,7 @@ func RenameChat(address string) error {
 	ctx := context.Background()
 	reader := kafka.NewReader(kafka.ReaderConfig{
 		Brokers:        []string{address},
-		Topic:          "register",
+		Topic:          "rename",
 		CommitInterval: 1 * time.Second,
 		GroupID:        "rec_team",
 		StartOffset:    kafka.FirstOffset,
@@ -51,13 +53,8 @@ func RenameChat(address string) error {
 		if err != nil {
 			return err
 		}
-		var user model.User
-		err = json.Unmarshal(ms.Value, &user)
-		if err != nil {
-			return err
-		}
 
-		err = dao.Register(&user)
+		err = dao.RenameChat(ms.Key, ms.Value)
 		if err != nil {
 			return err
 		}
@@ -68,7 +65,7 @@ func DeleteChat(address string) error {
 	ctx := context.Background()
 	reader := kafka.NewReader(kafka.ReaderConfig{
 		Brokers:        []string{address},
-		Topic:          "register",
+		Topic:          "delete",
 		CommitInterval: 1 * time.Second,
 		GroupID:        "rec_team",
 		StartOffset:    kafka.FirstOffset,
@@ -79,13 +76,8 @@ func DeleteChat(address string) error {
 		if err != nil {
 			return err
 		}
-		var user model.User
-		err = json.Unmarshal(ms.Value, &user)
-		if err != nil {
-			return err
-		}
 
-		err = dao.Register(&user)
+		err = dao.DeleteChat(ms.Key)
 		if err != nil {
 			return err
 		}
@@ -96,7 +88,7 @@ func SendQA(address string) error {
 	ctx := context.Background()
 	reader := kafka.NewReader(kafka.ReaderConfig{
 		Brokers:        []string{address},
-		Topic:          "register",
+		Topic:          "send_qa",
 		CommitInterval: 1 * time.Second,
 		GroupID:        "rec_team",
 		StartOffset:    kafka.FirstOffset,
@@ -107,13 +99,13 @@ func SendQA(address string) error {
 		if err != nil {
 			return err
 		}
-		var user model.User
-		err = json.Unmarshal(ms.Value, &user)
+		var qa model.QA
+		err = json.Unmarshal(ms.Value, &qa)
 		if err != nil {
 			return err
 		}
 
-		err = dao.Register(&user)
+		err = dao.SendQA(ms.Key, &qa)
 		if err != nil {
 			return err
 		}
