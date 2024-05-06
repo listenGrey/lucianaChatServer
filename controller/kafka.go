@@ -10,6 +10,7 @@ import (
 	"context"
 )
 
+// NewChat 新建对话
 func NewChat(address string) error {
 	ctx := context.Background()
 	reader := kafka.NewReader(kafka.ReaderConfig{
@@ -25,7 +26,9 @@ func NewChat(address string) error {
 		if err != nil {
 			return err
 		}
-		var newChat model.Chat
+		// key = uid
+		// value = {cid,name}
+		var newChat model.ChatInfo
 		err = json.Unmarshal(ms.Value, &newChat)
 		if err != nil {
 			return err
@@ -38,6 +41,7 @@ func NewChat(address string) error {
 	}
 }
 
+// RenameChat 对话重命名
 func RenameChat(address string) error {
 	ctx := context.Background()
 	reader := kafka.NewReader(kafka.ReaderConfig{
@@ -53,6 +57,8 @@ func RenameChat(address string) error {
 		if err != nil {
 			return err
 		}
+		// key = cid
+		// value = name
 
 		err = dao.RenameChat(ms.Key, ms.Value)
 		if err != nil {
@@ -61,6 +67,7 @@ func RenameChat(address string) error {
 	}
 }
 
+// DeleteChat 删除对话
 func DeleteChat(address string) error {
 	ctx := context.Background()
 	reader := kafka.NewReader(kafka.ReaderConfig{
@@ -76,6 +83,8 @@ func DeleteChat(address string) error {
 		if err != nil {
 			return err
 		}
+		// key = cid
+		// value = nil
 
 		err = dao.DeleteChat(ms.Key)
 		if err != nil {
@@ -84,6 +93,7 @@ func DeleteChat(address string) error {
 	}
 }
 
+// SendQA 发送QA
 func SendQA(address string) error {
 	ctx := context.Background()
 	reader := kafka.NewReader(kafka.ReaderConfig{
@@ -99,6 +109,8 @@ func SendQA(address string) error {
 		if err != nil {
 			return err
 		}
+		// key = cid
+		// value = qa
 		var qa model.QA
 		err = json.Unmarshal(ms.Value, &qa)
 		if err != nil {
