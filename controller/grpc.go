@@ -14,7 +14,7 @@ import (
 
 // GrpcService 需要 gRpc 获取数据的函数
 func GrpcService(address string) error {
-	serverCert, err := tls.LoadX509KeyPair("server.crt", "server.key")
+	serverCert, err := tls.LoadX509KeyPair("/ca/server.crt", "/ca/server.key")
 	if err != nil {
 		return err
 	}

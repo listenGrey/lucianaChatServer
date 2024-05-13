@@ -1,11 +1,13 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"lucianaChatServer/controller"
 )
 
 func main() {
+	fmt.Println("正在运行")
 	if err := controller.NewChat("localhost:9092"); err != nil {
 		log.Fatalf("新建对话挂掉了, %s", err)
 		return

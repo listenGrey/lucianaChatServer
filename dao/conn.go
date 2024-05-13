@@ -8,7 +8,7 @@ import (
 )
 
 func MongoDBClient(db, col string) *mongo.Collection {
-	client, err := mongo.Connect(context.Background(), options.Client().ApplyURI("mongodb://localhost:27017"))
+	client, err := mongo.Connect(context.Background(), options.Client().ApplyURI("mongodb://172.17.0.2:27017"))
 	if err != nil {
 		return nil
 	}
