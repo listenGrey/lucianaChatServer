@@ -4,6 +4,7 @@ import (
 	"errors"
 	"github.com/listenGrey/lucianagRpcPKG/chat"
 	"go.mongodb.org/mongo-driver/bson"
+	"lucianaChatServer/conf"
 	"lucianaChatServer/model"
 
 	"context"
@@ -11,7 +12,7 @@ import (
 
 // GetChats 获取对话列表
 func GetChats(uid int64) (*chat.Chats, error) {
-	client := MongoDBClient("luciana_chat_db", "chats")
+	client := MongoDBClient(conf.Database, conf.Collection)
 	if client == nil {
 		return nil, errors.New("连接MongoDB失败")
 	}
@@ -33,7 +34,7 @@ func GetChats(uid int64) (*chat.Chats, error) {
 
 // NewChat 新建对话
 func NewChat(uid []byte, c *model.ChatInfo) error {
-	client := MongoDBClient("luciana_chat_db", "chats")
+	client := MongoDBClient(conf.Database, conf.Collection)
 	if client == nil {
 		return errors.New("连接MongoDB失败")
 	}
@@ -61,7 +62,7 @@ func NewChat(uid []byte, c *model.ChatInfo) error {
 
 // GetChat 获取对话
 func GetChat(cid int64) (*chat.Chat, error) {
-	client := MongoDBClient("luciana_chat_db", "chats")
+	client := MongoDBClient(conf.Database, conf.Collection)
 	if client == nil {
 		return nil, errors.New("连接MongoDB失败")
 	}
@@ -83,7 +84,7 @@ func GetChat(cid int64) (*chat.Chat, error) {
 
 // RenameChat 对话重命名
 func RenameChat(cid, name []byte) error {
-	client := MongoDBClient("luciana_chat_db", "chats")
+	client := MongoDBClient(conf.Database, conf.Collection)
 	if client == nil {
 		return errors.New("连接MongoDB失败")
 	}
@@ -101,7 +102,7 @@ func RenameChat(cid, name []byte) error {
 
 // DeleteChat 删除对话
 func DeleteChat(cid []byte) error {
-	client := MongoDBClient("luciana_chat_db", "chats")
+	client := MongoDBClient(conf.Database, conf.Collection)
 	if client == nil {
 		return errors.New("连接MongoDB失败")
 	}
@@ -117,7 +118,7 @@ func DeleteChat(cid []byte) error {
 
 // SendQA 发送对话
 func SendQA(cid []byte, qa *model.QA) error {
-	client := MongoDBClient("luciana_chat_db", "chats")
+	client := MongoDBClient(conf.Database, conf.Collection)
 	if client == nil {
 		return errors.New("连接MongoDB失败")
 	}

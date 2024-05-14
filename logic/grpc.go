@@ -1,4 +1,4 @@
-package controller
+package logic
 
 import (
 	"crypto/tls"
@@ -25,7 +25,7 @@ func GrpcService(address string) error {
 		return err
 	}
 	if ok := certPool.AppendCertsFromPEM(caCert); !ok {
-		return errors.New(" Failed to append client CA certificate to pool")
+		return errors.New("failed to append client CA certificate to pool")
 	}
 
 	tlsConfig := &tls.Config{

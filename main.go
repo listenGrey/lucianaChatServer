@@ -2,30 +2,35 @@ package main
 
 import (
 	"fmt"
-	"log"
 	"lucianaChatServer/controller"
 )
 
 func main() {
 	fmt.Println("正在运行")
-	if err := controller.NewChat("localhost:9092"); err != nil {
-		log.Fatalf("新建对话挂掉了, %s", err)
-		return
-	}
-	if err := controller.RenameChat("localhost:9092"); err != nil {
-		log.Fatalf("对话重命名挂掉了, %s", err)
-		return
-	}
-	if err := controller.DeleteChat("localhost:9092"); err != nil {
-		log.Fatalf("删除对话挂掉了, %s", err)
-		return
-	}
-	if err := controller.SendQA("localhost:9092"); err != nil {
-		log.Fatalf("发送问题挂掉了, %s", err)
-		return
-	}
-	if err := controller.GrpcService("localhost:8964"); err != nil {
-		log.Fatalf("gRpc 服务挂掉了, %s", err)
-		return
+	errCh1 := make(chan error)
+	errCh2 := make(chan error)
+	errCh3 := make(chan error)
+	errCh4 := make(chan error)
+	errCh5 := make(chan error)
+
+	go controller.NewChat(errCh1)
+	go controller.RenameChat(errCh2)
+	go controller.DeleteChat(errCh3)
+	go controller.SendQA(errCh4)
+	go controller.GrpcService(errCh5)
+
+	for {
+		select {
+		case err := <-errCh1:
+			fmt.Printf("新建对话挂掉了, %s\n", err)
+		case err := <-errCh2:
+			fmt.Printf("对话重命名挂掉了, %s\n", err)
+		case err := <-errCh3:
+			fmt.Printf("删除对话挂掉了, %s\n", err)
+		case err := <-errCh4:
+			fmt.Printf("发送问题挂掉了, %s\n", err)
+		case err := <-errCh5:
+			fmt.Printf("gRpc 服务挂掉了, %s \n", err)
+		}
 	}
 }
