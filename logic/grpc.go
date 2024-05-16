@@ -8,12 +8,13 @@ import (
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials"
 	"io/ioutil"
+	"lucianaChatServer/conf"
 	service "lucianaChatServer/grpc"
 	"net"
 )
 
 // GrpcService 需要 gRpc 获取数据的函数
-func GrpcService(address string) error {
+func GrpcService() error {
 	serverCert, err := tls.LoadX509KeyPair("/ca/server.crt", "/ca/server.key")
 	if err != nil {
 		return err
@@ -34,7 +35,7 @@ func GrpcService(address string) error {
 		ClientAuth:   tls.RequireAndVerifyClientCert,
 	}
 
-	listen, err := net.Listen("tcp", address) //local ip and port
+	listen, err := net.Listen("tcp", conf.GrpcServerAddress) //local ip and port
 	if err != nil {
 		return err
 	}

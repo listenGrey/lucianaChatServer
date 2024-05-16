@@ -3,6 +3,7 @@ package logic
 import (
 	"encoding/json"
 	"github.com/segmentio/kafka-go"
+	"lucianaChatServer/conf"
 	"lucianaChatServer/dao"
 	"lucianaChatServer/model"
 	"time"
@@ -11,11 +12,11 @@ import (
 )
 
 // NewChat 新建对话
-func NewChat(address string) error {
+func NewChat() error {
 	ctx := context.Background()
 
 	reader := kafka.NewReader(kafka.ReaderConfig{
-		Brokers:        []string{address},
+		Brokers:        []string{conf.KafkaServerAddress},
 		Topic:          "new_chat",
 		CommitInterval: 1 * time.Second,
 		GroupID:        "new_chat",
@@ -43,11 +44,11 @@ func NewChat(address string) error {
 }
 
 // RenameChat 对话重命名
-func RenameChat(address string) error {
+func RenameChat() error {
 	ctx := context.Background()
 
 	reader := kafka.NewReader(kafka.ReaderConfig{
-		Brokers:        []string{address},
+		Brokers:        []string{conf.KafkaServerAddress},
 		Topic:          "rename",
 		CommitInterval: 1 * time.Second,
 		GroupID:        "rename",
@@ -70,11 +71,11 @@ func RenameChat(address string) error {
 }
 
 // DeleteChat 删除对话
-func DeleteChat(address string) error {
+func DeleteChat() error {
 	ctx := context.Background()
 
 	reader := kafka.NewReader(kafka.ReaderConfig{
-		Brokers:        []string{address},
+		Brokers:        []string{conf.KafkaServerAddress},
 		Topic:          "delete",
 		CommitInterval: 1 * time.Second,
 		GroupID:        "delete",
@@ -97,11 +98,11 @@ func DeleteChat(address string) error {
 }
 
 // SendQA 发送QA
-func SendQA(address string) error {
+func SendQA() error {
 	ctx := context.Background()
 
 	reader := kafka.NewReader(kafka.ReaderConfig{
-		Brokers:        []string{address},
+		Brokers:        []string{conf.KafkaServerAddress},
 		Topic:          "send_qa",
 		CommitInterval: 1 * time.Second,
 		GroupID:        "send_qa",
