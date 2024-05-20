@@ -6,6 +6,6 @@ var (
 	DBAddress          = "mongodb://172.17.0.2:27017"
 	Database           = "luciana_chat_db"
 	Collection         = "chats"
-	CertFile           = "/ca/server.crt"
-	KeyFile            = "/ca/server.key"
+	CertFile           = "./ca/server.crt"
+	KeyFile            = "./ca/server.key"
 )
