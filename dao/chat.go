@@ -10,7 +10,7 @@ import (
 )
 
 // GetChats 获取对话列表
-func GetChats(uid int64) (*chat.Chats, error) {
+func GetChats(uid int64) (*chat.ChatList, error) {
 	client := MongoDBClient()
 	if client == nil {
 		return nil, errors.New("连接MongoDB失败")

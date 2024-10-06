@@ -1,61 +1,37 @@
 package controller
 
 import (
-	"fmt"
-	"lucianaChatServer/logic"
+	"github.com/listenGrey/lucianagRpcPKG/chat"
+	"google.golang.org/grpc"
+	"lucianaChatServer/conf"
+	service "lucianaChatServer/grpc"
+	"net"
 )
 
-func NewChat(errCh chan<- error) {
-	fmt.Println("new chat 服务正在运行")
-	for {
-		// 出现错误则发送到通道
-		if err := logic.NewChat(); err != nil {
-			errCh <- err
-			return
-		}
+func ChatService() error {
+	/*cerds, err := credentials.NewServerTLSFromFile(conf.CertFile, conf.KeyFile)
+	if err != nil {
+		return err
+	}*/
+	listen, err := net.Listen("tcp", conf.GrpcServerAddress) //local ip and port
+	if err != nil {
+		return err
 	}
-}
 
-func SendQA(errCh chan<- error) {
-	fmt.Println("send qa 服务正在运行")
-	for {
-		// 出现错误则发送到通道
-		if err := logic.SendQA(); err != nil {
-			errCh <- err
-			return
-		}
-	}
-}
+	//初始化 gRpc server
+	server := grpc.NewServer(
+	//grpc.Creds(cerds)
+	)
 
-func Rename(errCh chan<- error) {
-	fmt.Println("rename 服务正在运行")
-	for {
-		// 出现错误则发送到通道
-		if err := logic.RenameChat(); err != nil {
-			errCh <- err
-			return
-		}
-	}
-}
+	chat.RegisterGetChatListServer(server, &service.ChatList{})
+	chat.RegisterGetChatServer(server, &service.GetChat{})
+	chat.RegisterNewChatServer(server, &service.NewChat{})
+	chat.RegisterRenameChatServer(server, &service.RenameChat{})
+	chat.RegisterDeleteChatServer(server, &service.DeleteChat{})
 
-func Delete(errCh chan<- error) {
-	fmt.Println("delete 服务正在运行")
-	for {
-		// 出现错误则发送到通道
-		if err := logic.DeleteChat(); err != nil {
-			errCh <- err
-			return
-		}
+	if err = server.Serve(listen); err != nil {
+		return err
 	}
-}
 
-func GrpcService(errCh chan<- error) {
-	fmt.Println("gRpc 服务正在运行")
-	for {
-		// 出现错误则发送到通道
-		if err := logic.GrpcService(); err != nil {
-			errCh <- err
-			return
-		}
-	}
+	return nil
 }

@@ -30,8 +30,8 @@ func IdMarshal(ori []byte) int64 {
 	return int64(res)
 }
 
-func ChatsUnmarshal(c *[]Chat) *chat.Chats {
-	var res *chat.Chats
+func ChatsUnmarshal(c *[]Chat) *chat.ChatList {
+	var res *chat.ChatList
 	var chats []*chat.Chat
 
 	for _, v := range *c {
@@ -43,7 +43,7 @@ func ChatsUnmarshal(c *[]Chat) *chat.Chats {
 		chats = append(chats, &ch)
 	}
 
-	res.Chats = chats
+	res.ChatList = chats
 
 	return res
 }
