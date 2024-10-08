@@ -26,7 +26,7 @@ func NewChat(newChat *model.Chat) error {
 
 	// 构造消息
 	key := []byte(fmt.Sprintf("%d", newChat.Uid)) // key = uid
-	value, err := json.Marshal(new)               // value = data
+	value, err := json.Marshal(newChat)           // value = data
 	if err != nil {
 		return err
 	}

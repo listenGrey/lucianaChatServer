@@ -5,28 +5,28 @@ import (
 )
 
 type ChatList struct {
-	Uid   int64      `bson:"_id"`
-	Chats []ChatInfo `bson:"chats"`
+	Uid   int64      `json:"uid" bson:"_id"`
+	Chats []ChatInfo `json:"chats" bson:"chats"`
 }
 
 // ChatInfo 接收 chat info
 type ChatInfo struct {
-	Cid  int64  `bson:"cid"`
-	Name string `bson:"name"`
+	Cid  int64  `json:"cid" bson:"cid"`
+	Name string `json:"name" bson:"name"`
 }
 
 // Chat 存储在 MongoDB 中的结构
 type Chat struct {
-	Cid  int64  `bson:"_id"`
-	Uid  int64  `bson:"uid"`
-	Name string `bson:"name"`
-	QAs  []QA   `bson:"qas"`
+	Cid  int64  `json:"cid" bson:"_id"`
+	Uid  int64  `json:"uid" bson:"uid"`
+	Name string `json:"name" bson:"name"`
+	QAs  []QA   `json:"qas" bson:"qas"`
 }
 
 // QA 接收QA
 type QA struct {
-	Request  string `bson:"request"`
-	Response string `bson:"response"`
+	Request  string `json:"request" bson:"request"`
+	Response string `json:"response" bson:"response"`
 }
 
 func ChatListsUnmarshal(uid int64, c *[]ChatInfo) *chat.ChatList {
