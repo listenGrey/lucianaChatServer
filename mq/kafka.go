@@ -10,7 +10,7 @@ import (
 )
 
 // NewChat 使用kafka发送新聊天信息
-func NewChat(uid int64, new *model.ChatInfo) error {
+func NewChat(newChat *model.Chat) error {
 	ctx := context.Background()
 	// 创建 Kafka 生产者
 	writer := &kafka.Writer{
@@ -25,8 +25,8 @@ func NewChat(uid int64, new *model.ChatInfo) error {
 	defer writer.Close()
 
 	// 构造消息
-	key := []byte(fmt.Sprintf("%d", uid)) // key = uid
-	value, err := json.Marshal(new)       // value = data
+	key := []byte(fmt.Sprintf("%d", newChat.Uid)) // key = uid
+	value, err := json.Marshal(new)               // value = data
 	if err != nil {
 		return err
 	}
@@ -47,7 +47,7 @@ func NewChat(uid int64, new *model.ChatInfo) error {
 }
 
 // RenameChat 使用kafka发送修改聊天名
-func RenameChat(cid int64, name string) error {
+func RenameChat(chat *model.ChatInfo) error {
 	ctx := context.Background()
 	// 创建 Kafka 生产者
 	writer := &kafka.Writer{
@@ -62,8 +62,8 @@ func RenameChat(cid int64, name string) error {
 	defer writer.Close()
 
 	// 构造消息
-	key := []byte(fmt.Sprintf("%d", cid)) // key = cid
-	value := []byte(name)                 // value = name
+	key := []byte(fmt.Sprintf("%d", chat.Cid)) // key = cid
+	value := []byte(chat.Name)                 // value = name
 
 	// 发送消息
 	err := writer.WriteMessages(

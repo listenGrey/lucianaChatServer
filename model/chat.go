@@ -1,20 +1,18 @@
 package model
 
 import (
-	"encoding/binary"
 	"github.com/listenGrey/lucianagRpcPKG/chat"
 )
 
-// QA 接收QA
-type QA struct {
-	Request  string `json:"request" bson:"request"`
-	Response string `json:"response" bson:"response"`
+type ChatList struct {
+	Uid   int64      `bson:"_id"`
+	Chats []ChatInfo `bson:"chats"`
 }
 
 // ChatInfo 接收 chat info
 type ChatInfo struct {
-	Cid  int64  `json:"cid"`
-	Name string `json:"name"`
+	Cid  int64  `bson:"cid"`
+	Name string `bson:"name"`
 }
 
 // Chat 存储在 MongoDB 中的结构
@@ -22,29 +20,30 @@ type Chat struct {
 	Cid  int64  `bson:"_id"`
 	Uid  int64  `bson:"uid"`
 	Name string `bson:"name"`
-	QAs  []QA   `bson:"qa_s"`
+	QAs  []QA   `bson:"qas"`
 }
 
-func IdMarshal(ori []byte) int64 {
-	res := binary.BigEndian.Uint64(ori)
-	return int64(res)
+// QA 接收QA
+type QA struct {
+	Request  string `bson:"request"`
+	Response string `bson:"response"`
 }
 
-func ChatsUnmarshal(c *[]Chat) *chat.ChatList {
+func ChatListsUnmarshal(uid int64, c *[]ChatInfo) *chat.ChatList {
 	var res *chat.ChatList
-	var chats []*chat.Chat
+	var chats []*chat.ChatInfo
+
+	res.Uid = uid
 
 	for _, v := range *c {
-		var ch chat.Chat
+		var ch *chat.ChatInfo
 
-		ch.Id = v.Cid
+		ch.Cid = v.Cid
 		ch.Name = v.Name
 
-		chats = append(chats, &ch)
+		chats = append(chats, ch)
 	}
-
-	res.ChatList = chats
-
+	res.Chats = chats
 	return res
 }
 
@@ -53,17 +52,45 @@ func ChatUnmarshal(c *Chat) *chat.Chat {
 	var qas []*chat.QA
 
 	for _, v := range c.QAs {
-		var qa chat.QA
+		var qa *chat.QA
 
 		qa.Request = v.Request
 		qa.Response = v.Response
 
-		qas = append(qas, &qa)
+		qas = append(qas, qa)
 	}
 
-	ch.Id = c.Cid
+	ch.Cid = c.Cid
 	ch.Name = c.Name
 	ch.Qas = qas
 
 	return ch
+}
+
+func ChatMarshal(c *chat.Chat) *Chat {
+	var ch *Chat
+	var qas []QA
+
+	for _, v := range c.Qas {
+		var qa QA
+
+		qa.Request = v.Request
+		qa.Response = v.Response
+
+		qas = append(qas, qa)
+	}
+
+	ch.Cid = c.Cid
+	ch.Name = c.Name
+	ch.QAs = qas
+
+	return ch
+
+}
+
+func ChatInfoMarshal(c *chat.ChatInfo) *ChatInfo {
+	return &ChatInfo{
+		Cid:  c.GetCid(),
+		Name: c.GetName(),
+	}
 }

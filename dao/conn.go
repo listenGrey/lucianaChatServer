@@ -3,19 +3,32 @@ package dao
 import (
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
+	"log"
 	"lucianaChatServer/conf"
+	"time"
 
 	"context"
 )
 
-func MongoDBClient() *mongo.Collection {
-	client, err := mongo.Connect(context.Background(), options.Client().ApplyURI(conf.DBAddress))
+var MongoDB *mongo.Client
+
+func InitClient() (*mongo.Client, error) {
+	// 设置连接选项
+	clientOptions := options.Client().ApplyURI(conf.DBAddress).SetConnectTimeout(10 * time.Second).SetSocketTimeout(1 * time.Second)
+
+	// 创建一个新的客户端并连接到MongoDB
+	client, err := mongo.Connect(context.Background(), clientOptions)
 	if err != nil {
-		return nil
+		return nil, err
 	}
 
-	// 选择数据库和集合
-	conn := client.Database(conf.Database).Collection(conf.Collection)
+	// 检查连接
+	err = client.Ping(context.TODO(), nil)
+	if err != nil {
+		return nil, err
+	}
 
-	return conn
+	log.Println("Connected to MongoDB!")
+
+	return client, nil
 }

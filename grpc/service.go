@@ -5,6 +5,9 @@ import (
 	"github.com/listenGrey/lucianagRpcPKG/chat"
 	"google.golang.org/grpc/peer"
 	"log"
+	"lucianaChatServer/dao"
+	"lucianaChatServer/model"
+	"lucianaChatServer/mq"
 )
 
 type ChatList struct {
@@ -16,12 +19,12 @@ func (c *ChatList) GetChatList(ctx context.Context, uid *chat.ID) (*chat.ChatLis
 	if ok {
 		log.Printf("获取对话列表")
 	}
-	/*chats, err := dao.GetChats(uid.GetId())
+	chatInfos, err := dao.GetChatList(ctx, uid.GetId())
 	if err != nil {
 		return nil, err
-	}*/
+	}
 
-	return nil, nil
+	return model.ChatListsUnmarshal(uid.GetId(), chatInfos), nil
 }
 
 type GetChat struct {
@@ -33,36 +36,50 @@ func (c *GetChat) GetChat(ctx context.Context, cid *chat.ID) (*chat.Chat, error)
 	if ok {
 		log.Printf("获取对话")
 	}
-	/*ch, err := dao.GetChat(cid.GetId())
+	chats, err := dao.GetChat(ctx, cid.GetId())
 	if err != nil {
 		return nil, err
-	}*/
+	}
 
-	return nil, nil
+	return model.ChatUnmarshal(chats), nil
 }
 
 type NewChat struct {
 	chat.UnimplementedNewChatServer
 }
 
-func (c *NewChat) NewChat(ctx context.Context, uc *chat.UserChat) (*chat.Null, error) {
+func (c *NewChat) NewChat(ctx context.Context, ch *chat.Chat) (*chat.Null, error) {
 	_, ok := peer.FromContext(ctx)
 	if ok {
 		log.Printf("新建对话")
 	}
-	return nil, nil
+
+	newChat := model.ChatMarshal(ch)
+	err := mq.NewChat(newChat)
+	if err != nil {
+		return &chat.Null{}, err
+	}
+
+	return &chat.Null{}, nil
 }
 
 type RenameChat struct {
 	chat.UnimplementedRenameChatServer
 }
 
-func (c *RenameChat) RenameChat(ctx context.Context, ch *chat.Chat) (*chat.Null, error) {
+func (c *RenameChat) RenameChat(ctx context.Context, ch *chat.ChatInfo) (*chat.Null, error) {
 	_, ok := peer.FromContext(ctx)
 	if ok {
 		log.Printf("对话重命名")
 	}
-	return nil, nil
+
+	chats := model.ChatInfoMarshal(ch)
+	err := mq.RenameChat(chats)
+	if err != nil {
+		return &chat.Null{}, err
+	}
+
+	return &chat.Null{}, nil
 }
 
 type DeleteChat struct {
@@ -74,5 +91,10 @@ func (c *DeleteChat) DeleteChat(ctx context.Context, cid *chat.ID) (*chat.Null, 
 	if ok {
 		log.Printf("删除对话")
 	}
-	return nil, nil
+
+	err := mq.DeleteChat(cid.GetId())
+	if err != nil {
+		return &chat.Null{}, err
+	}
+	return &chat.Null{}, nil
 }
