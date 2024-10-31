@@ -24,7 +24,13 @@ func (c *ChatList) GetChatList(ctx context.Context, uid *chat.ID) (*chat.ChatLis
 		return nil, err
 	}
 
-	return model.ChatListsUnmarshal(uid.GetId(), chatInfos), nil
+	res := *chatInfos
+	j := len(res) - 1
+	for i := 0; i < len(res)/2; i++ {
+		res[i], res[j] = res[j], res[i]
+		j--
+	}
+	return model.ChatListsUnmarshal(uid.GetId(), &res), nil
 }
 
 type GetChat struct {
@@ -67,14 +73,15 @@ type RenameChat struct {
 	chat.UnimplementedRenameChatServer
 }
 
-func (c *RenameChat) RenameChat(ctx context.Context, ch *chat.ChatInfo) (*chat.Null, error) {
+func (c *RenameChat) RenameChat(ctx context.Context, ch *chat.Chat) (*chat.Null, error) {
 	_, ok := peer.FromContext(ctx)
 	if ok {
 		log.Printf("对话重命名")
 	}
 
-	chats := model.ChatInfoMarshal(ch)
+	chats := model.ChatMarshal(ch)
 	err := mq.RenameChat(chats)
+
 	if err != nil {
 		return &chat.Null{}, err
 	}
@@ -86,13 +93,14 @@ type DeleteChat struct {
 	chat.UnimplementedDeleteChatServer
 }
 
-func (c *DeleteChat) DeleteChat(ctx context.Context, cid *chat.ID) (*chat.Null, error) {
+func (c *DeleteChat) DeleteChat(ctx context.Context, ch *chat.Chat) (*chat.Null, error) {
 	_, ok := peer.FromContext(ctx)
 	if ok {
 		log.Printf("删除对话")
 	}
 
-	err := mq.DeleteChat(cid.GetId())
+	chats := model.ChatMarshal(ch)
+	err := mq.DeleteChat(chats)
 	if err != nil {
 		return &chat.Null{}, err
 	}

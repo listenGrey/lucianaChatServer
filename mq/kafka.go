@@ -47,7 +47,7 @@ func NewChat(newChat *model.Chat) error {
 }
 
 // RenameChat 使用kafka发送修改聊天名
-func RenameChat(chat *model.ChatInfo) error {
+func RenameChat(chat *model.Chat) error {
 	ctx := context.Background()
 	// 创建 Kafka 生产者
 	writer := &kafka.Writer{
@@ -62,11 +62,14 @@ func RenameChat(chat *model.ChatInfo) error {
 	defer writer.Close()
 
 	// 构造消息
-	key := []byte(fmt.Sprintf("%d", chat.Cid)) // key = cid
-	value := []byte(chat.Name)                 // value = name
+	key := []byte(fmt.Sprintf("%d", chat.Uid)) // key = cid
+	value, err := json.Marshal(chat)           // value = data
+	if err != nil {
+		return err
+	}
 
 	// 发送消息
-	err := writer.WriteMessages(
+	err = writer.WriteMessages(
 		ctx,
 		kafka.Message{
 			Key:   key,
@@ -81,7 +84,7 @@ func RenameChat(chat *model.ChatInfo) error {
 }
 
 // DeleteChat 使用kafka发送删除聊天
-func DeleteChat(cid int64) error {
+func DeleteChat(chat *model.Chat) error {
 	ctx := context.Background()
 	// 创建 Kafka 生产者
 	writer := &kafka.Writer{
@@ -96,11 +99,14 @@ func DeleteChat(cid int64) error {
 	defer writer.Close()
 
 	// 构造消息
-	key := []byte(fmt.Sprintf("%d", cid)) // key = cid
-	var value []byte                      // value = nil
+	key := []byte(fmt.Sprintf("%d", chat.Uid)) // key = cid
+	value, err := json.Marshal(chat)           // value = data
+	if err != nil {
+		return err
+	}
 
 	// 发送消息
-	err := writer.WriteMessages(
+	err = writer.WriteMessages(
 		ctx,
 		kafka.Message{
 			Key:   key,

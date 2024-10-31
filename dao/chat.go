@@ -17,7 +17,7 @@ func GetChatList(ctx context.Context, uid int64) (*[]model.ChatInfo, error) {
 	err := clo.FindOne(ctx, filter).Decode(&chatList)
 	if err != nil {
 		if err == mongo.ErrNoDocuments {
-			return nil, fmt.Errorf("no chat list found for uid: %d", uid)
+			return &chatList.Chats, nil
 		}
 		return nil, err
 	}

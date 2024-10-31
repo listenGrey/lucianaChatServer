@@ -30,45 +30,46 @@ type QA struct {
 }
 
 func ChatListsUnmarshal(uid int64, c *[]ChatInfo) *chat.ChatList {
-	var res *chat.ChatList
+	var res chat.ChatList
 	var chats []*chat.ChatInfo
 
 	res.Uid = uid
 
 	for _, v := range *c {
-		var ch *chat.ChatInfo
+		var ch chat.ChatInfo
 
 		ch.Cid = v.Cid
 		ch.Name = v.Name
 
-		chats = append(chats, ch)
+		chats = append(chats, &ch)
 	}
 	res.Chats = chats
-	return res
+	return &res
 }
 
 func ChatUnmarshal(c *Chat) *chat.Chat {
-	var ch *chat.Chat
+	var ch chat.Chat
 	var qas []*chat.QA
 
 	for _, v := range c.QAs {
-		var qa *chat.QA
+		var qa chat.QA
 
 		qa.Request = v.Request
 		qa.Response = v.Response
 
-		qas = append(qas, qa)
+		qas = append(qas, &qa)
 	}
 
 	ch.Cid = c.Cid
+	ch.Uid = c.Uid
 	ch.Name = c.Name
 	ch.Qas = qas
 
-	return ch
+	return &ch
 }
 
 func ChatMarshal(c *chat.Chat) *Chat {
-	var ch *Chat
+	var ch Chat
 	var qas []QA
 
 	for _, v := range c.Qas {
@@ -81,16 +82,10 @@ func ChatMarshal(c *chat.Chat) *Chat {
 	}
 
 	ch.Cid = c.Cid
+	ch.Uid = c.Uid
 	ch.Name = c.Name
 	ch.QAs = qas
 
-	return ch
+	return &ch
 
-}
-
-func ChatInfoMarshal(c *chat.ChatInfo) *ChatInfo {
-	return &ChatInfo{
-		Cid:  c.GetCid(),
-		Name: c.GetName(),
-	}
 }
