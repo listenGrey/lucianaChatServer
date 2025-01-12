@@ -3,9 +3,9 @@ package controller
 import (
 	"github.com/listenGrey/lucianagRpcPKG/chat"
 	"google.golang.org/grpc"
-	"lucianaChatServer/conf"
 	service "lucianaChatServer/grpc"
 	"net"
+	"os"
 )
 
 func ChatService() error {
@@ -13,7 +13,7 @@ func ChatService() error {
 	if err != nil {
 		return err
 	}*/
-	listen, err := net.Listen("tcp", conf.GrpcServerAddress) //local ip and port
+	listen, err := net.Listen("tcp", ":"+os.Getenv("CHAT_PORT"))
 	if err != nil {
 		return err
 	}

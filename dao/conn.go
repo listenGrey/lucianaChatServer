@@ -4,7 +4,7 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"log"
-	"lucianaChatServer/conf"
+	"os"
 	"time"
 
 	"context"
@@ -12,23 +12,25 @@ import (
 
 var MongoDB *mongo.Client
 
-func InitClient() (*mongo.Client, error) {
-	// 设置连接选项
-	clientOptions := options.Client().ApplyURI(conf.DBAddress).SetConnectTimeout(10 * time.Second).SetSocketTimeout(1 * time.Second)
+func init() {
+	var err error
+	// 设置 MongoDB 连接选项
+	clientOptions := options.Client().
+		ApplyURI("mongodb://" + os.Getenv("MONGO_USER") + ":" + os.Getenv("MONGO_PWD") + "@" + os.Getenv("MONGO_HOST") + ":" + os.Getenv("MONGO_PORT") + "/" + os.Getenv("MONGO_DB")).
+		SetMaxPoolSize(100).                  // 最大连接池大小
+		SetMinPoolSize(10).                   // 最小连接池大小
+		SetMaxConnIdleTime(10 * time.Minute). // 最大空闲时间
+		SetSocketTimeout(10 * time.Second)    // 连接超时时间
 
 	// 创建一个新的客户端并连接到MongoDB
-	client, err := mongo.Connect(context.Background(), clientOptions)
+	MongoDB, err = mongo.Connect(context.TODO(), clientOptions)
 	if err != nil {
-		return nil, err
+		log.Fatal(err)
 	}
 
 	// 检查连接
-	err = client.Ping(context.TODO(), nil)
+	err = MongoDB.Ping(context.TODO(), nil)
 	if err != nil {
-		return nil, err
+		log.Fatal(err)
 	}
-
-	log.Println("Connected to MongoDB!")
-
-	return client, nil
 }

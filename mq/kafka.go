@@ -4,8 +4,9 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"os"
+
 	"github.com/segmentio/kafka-go"
-	"lucianaChatServer/conf"
 	"lucianaChatServer/model"
 )
 
@@ -14,7 +15,7 @@ func NewChat(newChat *model.Chat) error {
 	ctx := context.Background()
 	// 创建 Kafka 生产者
 	writer := &kafka.Writer{
-		Addr:  kafka.TCP(conf.KafkaServerAddress),
+		Addr:  kafka.TCP(os.Getenv("KAFKA_ADDR") + ":" + os.Getenv("KAFKA_PORT")),
 		Topic: "new_chat",
 		//Balancer:               &kafka.Hash{},
 		//WriteTimeout:           1 * time.Second,
@@ -51,7 +52,7 @@ func RenameChat(chat *model.Chat) error {
 	ctx := context.Background()
 	// 创建 Kafka 生产者
 	writer := &kafka.Writer{
-		Addr:  kafka.TCP(conf.KafkaServerAddress),
+		Addr:  kafka.TCP(os.Getenv("KAFKA_ADDR") + ":" + os.Getenv("KAFKA_PORT")),
 		Topic: "rename",
 		//Balancer:               &kafka.Hash{},
 		//WriteTimeout:           1 * time.Second,
@@ -88,7 +89,7 @@ func DeleteChat(chat *model.Chat) error {
 	ctx := context.Background()
 	// 创建 Kafka 生产者
 	writer := &kafka.Writer{
-		Addr:  kafka.TCP(conf.KafkaServerAddress),
+		Addr:  kafka.TCP(os.Getenv("KAFKA_ADDR") + ":" + os.Getenv("KAFKA_PORT")),
 		Topic: "delete",
 		//Balancer:               &kafka.Hash{},
 		//WriteTimeout:           1 * time.Second,
